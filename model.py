@@ -2,30 +2,37 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import torch
+import os
+import urllib.request
 
 # Configuration
 CONFIDENCE_THRESHOLD = 0.50  # Seuil de confiance comme dans votre code
 CLASS_NAME = 'Tomat'  # Nom de la classe à détecter (pomme/tomate)
 
+MODEL_FILE = "best.pt"
+
+MODEL_URL = "https://drive.google.com/uc?export=download&id=1pumwaAfSB3YRi4yIo_b8-C3SapD3dtZR"
+
+def download_model():
+    if not os.path.exists(MODEL_FILE):
+        print("📥 Téléchargement du modèle...")
+        urllib.request.urlretrieve(MODEL_URL, MODEL_FILE)
+        print("✅ Modèle téléchargé")
+    else:
+        print("✔️ Modèle déjà téléchargé")
 def load_model():
-    """
-    Charge votre modèle YOLO entraîné
-    """
     try:
-        # Chemin vers votre modèle (à adapter)
-        model_path = "best.pt"  # Assurez-vous que le fichier est dans le dossier backend
-        
-        # Charger le modèle
-        model = YOLO(model_path)
-        
-        print(f"✅ Modèle chargé depuis {model_path}")
+        download_model()  # 👈 important
+
+        model = YOLO(MODEL_FILE)
+
+        print(f"✅ Modèle chargé depuis {MODEL_FILE}")
         print(f"📊 Classes: {model.names}")
-        
+
         return model
-        
+
     except Exception as e:
         print(f"❌ Erreur lors du chargement du modèle: {e}")
-        print("💡 Assurez-vous que le fichier 'best.pt' est présent dans le dossier backend")
         return None
 
 def detect_apples(model, image):
