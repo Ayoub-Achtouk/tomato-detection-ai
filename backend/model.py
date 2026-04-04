@@ -3,32 +3,57 @@ import numpy as np
 from ultralytics import YOLO
 import torch
 import os
-import urllib.request
+import gdown  # Installer: pip install gdown
 
 # Configuration
-CONFIDENCE_THRESHOLD = 0.50  # Seuil de confiance comme dans votre code
-CLASS_NAME = 'Tomat'  # Nom de la classe à détecter (pomme/tomate)
+CONFIDENCE_THRESHOLD = 0.50
+CLASS_NAME = 'Tomat'
 
 MODEL_FILE = "best.pt"
-
-MODEL_URL = "https://drive.google.com/uc?export=download&id=1pumwaAfSB3YRi4yIo_b8-C3SapD3dtZR"
+# Utiliser l'ID du fichier Google Drive
+GOOGLE_DRIVE_FILE_ID = "1pumwaAfSB3YRi4yIo_b8-C3SapD3dtZR"
 
 def download_model():
+    """Télécharge le modèle depuis Google Drive avec gdown"""
     if not os.path.exists(MODEL_FILE):
-        print("📥 Téléchargement du modèle...")
-        urllib.request.urlretrieve(MODEL_URL, MODEL_FILE)
-        print("✅ Modèle téléchargé")
+        print("📥 Téléchargement du modèle depuis Google Drive...")
+        try:
+            # Méthode 1: Avec gdown (recommandé)
+            url = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
+            gdown.download(url, MODEL_FILE, quiet=False)
+            print("✅ Modèle téléchargé avec succès!")
+        except Exception as e:
+            print(f"❌ Erreur de téléchargement: {e}")
+            # Méthode 2: Alternative avec requests
+            try:
+                import requests
+                print("🔄 Tentative avec requests...")
+                # URL alternative pour Google Drive
+                download_url = f"https://drive.usercontent.google.com/download?id={GOOGLE_DRIVE_FILE_ID}&export=download&confirm=t"
+                response = requests.get(download_url, stream=True)
+                with open(MODEL_FILE, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                print("✅ Modèle téléchargé avec succès!")
+            except Exception as e2:
+                print(f"❌ Échec du téléchargement: {e2}")
+                raise
     else:
         print("✔️ Modèle déjà téléchargé")
+
 def load_model():
     try:
-        download_model()  # 👈 important
-
+        download_model()
+        
+        # Vérifier que le fichier existe et n'est pas vide
+        if os.path.getsize(MODEL_FILE) < 1000000:  # Moins de 1MB = fichier corrompu
+            print("⚠️ Fichier modèle corrompu, suppression et re-téléchargement...")
+            os.remove(MODEL_FILE)
+            download_model()
+        
         model = YOLO(MODEL_FILE)
-
         print(f"✅ Modèle chargé depuis {MODEL_FILE}")
         print(f"📊 Classes: {model.names}")
-
         return model
 
     except Exception as e:
@@ -36,136 +61,99 @@ def load_model():
         return None
 
 def detect_apples(model, image):
-    """
-    Détecte les pommes/tomates dans l'image avec YOLO
-    Retourne: (detections_list, annotated_image)
-    """
+    """Détecte les tomates dans l'image avec YOLO"""
     if model is None:
+        print("⚠️ Modèle non chargé, utilisation des détections factices")
         return get_dummy_detections(image), image
     
     # Faire la prédiction
-    results = model.predict(image, conf=CONFIDENCE_THRESHOLD)
+    results = model.predict(image, conf=CONFIDENCE_THRESHOLD, verbose=False)
     
     detections = []
     
-    # Traiter les résultats
-    if len(results) > 0:
-        # Récupérer les boîtes
+    if len(results) > 0 and results[0].boxes is not None:
         boxes = results[0].boxes
         
-        if boxes is not None and len(boxes) > 0:
-            # Convertir en CPU si nécessaire
-            if torch.is_tensor(boxes.xyxy):
-                boxes_xyxy = boxes.xyxy.cpu().numpy()
-                confs = boxes.conf.cpu().numpy()
-                classes = boxes.cls.cpu().numpy()
-            else:
-                boxes_xyxy = boxes.xyxy
-                confs = boxes.conf
-                classes = boxes.cls
+        if len(boxes) > 0:
+            # Récupérer les données
+            boxes_xyxy = boxes.xyxy.cpu().numpy()
+            confs = boxes.conf.cpu().numpy()
+            classes = boxes.cls.cpu().numpy()
             
             # Pour chaque détection
             for box, conf, cls in zip(boxes_xyxy, confs, classes):
                 x1, y1, x2, y2 = map(int, box)
                 class_name = results[0].names[int(cls)]
                 
-                # Filtrer par nom de classe (si nécessaire)
-                if class_name == CLASS_NAME or CLASS_NAME == 'Tomat':
-                    detections.append({
-                        'bbox': [x1, y1, x2, y2],
-                        'confidence': float(conf),
-                        'label': class_name,
-                        'class_id': int(cls)
-                    })
+                # Accepter toutes les détections (pas de filtre strict)
+                detections.append({
+                    'bbox': [x1, y1, x2, y2],
+                    'confidence': float(conf),
+                    'label': class_name,
+                    'class_id': int(cls)
+                })
             
-            # Annoter l'image avec les détections (comme dans votre code Colab)
-            annotated_image = annotate_image(image, results, boxes_xyxy, confs, classes, results[0].names)
-            
+            # Annoter l'image
+            annotated_image = annotate_image(image, detections)
         else:
             annotated_image = image
     else:
         annotated_image = image
     
+    print(f"🎯 {len(detections)} tomates détectées")
     return detections, annotated_image
 
-def annotate_image(image, results, boxes, confs, classes, class_names):
-    """
-    Annoter l'image avec les boîtes et les labels
-    Similaire à votre fonction plot_results
-    """
+def annotate_image(image, detections):
+    """Annoter l'image avec les boîtes et les labels"""
     img = image.copy()
     
     # Couleurs
-    box_color = (0, 0, 255)  # Rouge pour les tomates/pommes
-    text_bg_color = (255, 255, 255)  # Blanc
+    box_color = (0, 0, 255)  # Rouge
+    text_color = (255, 255, 255)  # Blanc
     
-    # Comptage par classe
-    counts = {}
-    for cls in classes:
-        cls_id = int(cls)
-        if cls_id not in counts:
-            counts[cls_id] = 1
-        else:
-            counts[cls_id] += 1
-    
-    # Dessiner chaque boîte
-    for box, conf, cls in zip(boxes, confs, classes):
-        x1, y1, x2, y2 = map(int, box)
-        class_name = class_names[int(cls)]
-        label = f'{class_name} {conf:.2f}'
+    for det in detections:
+        x1, y1, x2, y2 = det['bbox']
+        confidence = det['confidence']
+        label = det['label']
         
         # Dessiner le rectangle
-        cv2.rectangle(img, (x1, y1), (x2, y2), box_color, 4)
+        cv2.rectangle(img, (x1, y1), (x2, y2), box_color, 3)
         
-        # Préparer le texte
+        # Texte
+        text = f"{label}: {confidence:.2f}"
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 1.0
+        font_scale = 0.6
         thickness = 2
-        size = cv2.getTextSize(label, font, font_scale, thickness)[0]
+        (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
         
-        # Dessiner l'arrière-plan du texte
-        cv2.rectangle(img, 
-                     (x1, y1 - size[1] - 13), 
-                     (x1 + size[0], y1), 
-                     box_color, 
-                     -1)
-        
-        # Dessiner le texte
-        cv2.putText(img, label, (x1, y1 - 10), font, font_scale, text_bg_color, thickness)
+        # Fond du texte
+        cv2.rectangle(img, (x1, y1 - text_h - 5), (x1 + text_w, y1), box_color, -1)
+        cv2.putText(img, text, (x1, y1 - 5), font, font_scale, text_color, thickness)
     
-    # Ajouter le comptage total
-    total_count = sum(counts.values())
-    text_y = 40
-    for class_id, count in counts.items():
-        class_name = class_names[class_id]
-        count_text = f"Number of {class_name} = {count}"
-        cv2.putText(img, count_text, (20, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
-        text_y += 40
-    
-    # Ajouter le titre
-    cv2.putText(img, f"Total: {total_count} detections", (20, text_y), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
+    # Ajouter le compteur en haut
+    y_offset = 30
+    cv2.putText(img, f"Tomates detectees: {len(detections)}", 
+                (10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 
+                0.8, (0, 255, 0), 2)
     
     return img
 
 def get_dummy_detections(image):
-    """
-    Génère des détections factices pour les tests (si modèle non chargé)
-    """
+    """Détections factices pour les tests"""
     height, width = image.shape[:2]
     return [
         {
             'bbox': [int(width*0.2), int(height*0.3), 
                     int(width*0.4), int(height*0.6)],
             'confidence': 0.95,
-            'label': 'Tomat',
+            'label': 'Tomate',
             'class_id': 0
         },
         {
             'bbox': [int(width*0.6), int(height*0.4), 
                     int(width*0.8), int(height*0.7)],
             'confidence': 0.87,
-            'label': 'Tomat',
+            'label': 'Tomate',
             'class_id': 0
         }
     ]
