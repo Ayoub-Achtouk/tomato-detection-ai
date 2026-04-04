@@ -3,7 +3,7 @@ const landingPage = document.getElementById('landingPage');
 const mainApp = document.getElementById('mainApp');
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 const activateBtn = document.getElementById('activateAI');
-
+const API_BASE_URL = "https://tomato-detection-ai-production.up.railway.app";
 // Vérifier si l'IA a déjà été activée (session)
 if (sessionStorage.getItem('iaActivated') === 'true') {
     landingPage.style.display = 'none';
@@ -95,7 +95,7 @@ async function processImage(file) {
 
     try {
         console.log('📤 Envoi de l\'image...');
-        const response = await fetch('/api/detect', { method: 'POST', body: formData });
+        const response = await fetch(`${API_BASE_URL}/api/detect`);
         const data = await response.json();
         console.log('📥 Réponse:', data);
 
