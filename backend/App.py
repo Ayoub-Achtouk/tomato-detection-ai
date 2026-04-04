@@ -10,7 +10,14 @@ import sys
 
 # Ajouter le chemin du backend pour l'import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
+# Puis vos imports
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+import uuid
+import cv2
+import numpy as np
+import base64
+from werkzeug.utils import secure_filename
 # Importez votre modèle
 from model import load_model, detect_apples
 
