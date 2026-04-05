@@ -8,3 +8,4 @@ torch==2.0.1
 torchvision==0.15.2
 pillow==10.0.0
 requests==2.31.0
+gdown
