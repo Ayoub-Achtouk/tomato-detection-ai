@@ -3,9 +3,6 @@ flask-cors==4.0.0
 gunicorn==21.2.0
 opencv-python-headless==4.8.1.78
 numpy==1.24.3
-ultralytics==8.0.207
-torch==2.0.1
-torchvision==0.15.2
 pillow==10.0.0
 requests==2.31.0
-gdown
+ultralytics==8.0.207
