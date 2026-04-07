@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TomatoAI - Détection de tomates</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Page d'accueil avec fond tomate -->
+    <div id="landingPage" class="landing-page">
+        <div class="landing-overlay"></div>
+        <div class="landing-content">
+            <div class="landing-logo">
+                <span class="landing-logo-icon">🍅</span>
+                <h1 class="landing-title">Tomato<span class="landing-highlight">AI</span></h1>
+            </div>
+            <p class="landing-subtitle">Détection intelligente de tomates par IA</p>
+            <button id="activateAI" class="activate-btn">
+                <span>🤖</span>
+                Activer l'IA
+                <span>✨</span>
+            </button>
+            <p class="landing-info">Modèle YOLOv8 entraîné sur Google Colab</p>
+        </div>
+    </div>
+
+    <!-- Application principale (cachée au début) -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <span class="logo-icon">🍅</span>
+                    <span class="logo-text">Tomato<span class="logo-highlight">AI</span></span>
+                </div>
+                <div class="nav-status">
+                    <div class="status-indicator" id="serverStatus"></div>
+                    <span>IA activée</span>
+                    <button id="deactivateAI" class="deactivate-btn">🔌 Désactiver l'IA</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <!-- Zone de téléchargement -->
+            <div id="uploadSection" class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-icon">🍅</div>
+                    <h2>Téléchargez une image</h2>
+                    <p>Glissez-déposez une image ou cliquez pour sélectionner</p>
+                    <div class="upload-formats">
+                        <span class="format-badge">JPG</span>
+                        <span class="format-badge">PNG</span>
+                        <span class="format-badge">WEBP</span>
+                        <span class="format-badge">GIF</span>
+                    </div>
+                    <button class="btn-upload" id="uploadBtn">
+                        <span>📁</span> Choisir une image
+                    </button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <p class="upload-limit">Max 50MB · Haute précision YOLO</p>
+                </div>
+            </div>
+
+            <!-- Zone des résultats -->
+            <div id="resultSection" class="result-section" style="display: none;">
+                <!-- Analyse en cours -->
+                <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">🤖 Analyse en cours...</p>
+                    <p class="loading-sub">Le modèle YOLO détecte les tomates</p>
+                </div>
+
+                <!-- Conteneur des deux images côte à côte -->
+                <div class="comparison-container">
+                    <div class="image-card">
+                        <div class="image-card-header">
+                            <h3>📸 Image originale</h3>
+                            <span class="image-badge">Téléchargée</span>
+                        </div>
+                        <div class="image-card-body">
+                            <img id="originalImage" class="comparison-image" alt="Image originale">
+                        </div>
+                    </div>
+
+                    <div class="image-card">
+                        <div class="image-card-header">
+                            <h3>🎯 Résultat d'analyse</h3>
+                            <span class="image-badge detection-badge" id="detectionBadge">0 détection(s)</span>
+                        </div>
+                        <div class="image-card-body">
+                            <canvas id="resultCanvas" class="comparison-image"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques et détails -->
+                <div id="detectionResults" class="detection-results-card" style="display: none;">
+                    <div class="stats-header">
+                        <div class="stats-main">
+                            <div class="stat-circle">
+                                <span id="appleCountMain" class="stat-number-large">0</span>
+                                <span class="stat-label-large">tomates</span>
+                            </div>
+                            <div class="stat-details">
+                                <div class="confidence-bar-container">
+                                    <span class="confidence-label">Confiance moyenne</span>
+                                    <div class="confidence-bar">
+                                        <div id="confidenceFill" class="confidence-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span id="confidenceAvg" class="confidence-value">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detections-grid" id="detectionsList">
+                        <!-- Détails des détections -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-secondary" id="newImageBtn">🔄 Nouvelle image</button>
+                        <button class="btn-primary" id="downloadBtn">💾 Télécharger résultat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Entraîné sur Google Colab avec YOLOv8 · Détection de tomates en temps réel</p>
+        </footer>
+    </div>
+
+    <!-- Theme Toggle Button (Dark Mode) -->
+    <div class="theme-toggle" id="themeToggleBtn" style="display: none;">
+        <button class="theme-btn" id="themeToggle">
+            <span id="themeIcon">🌞</span>
+            <span id="themeText">Mode clair</span>
+        </button>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
