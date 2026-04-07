@@ -185,8 +185,11 @@ function displayResults(data, file) {
 function reset() {
     uploadSection.style.display = 'flex';
     resultSection.style.display = 'none';
+    detectionResults.style.display = 'none';
+    loadingOverlay.style.display = 'none';
     document.getElementById('imageInput').value = '';
-    if (currentImageFile) URL.revokeObjectURL(currentImageFile);
+    currentImageFile = null;
+    currentDetections = [];
     ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
     originalImage.src = '';
 }
