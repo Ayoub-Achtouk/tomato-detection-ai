@@ -271,7 +271,7 @@ async function processVideo(file) {
     currentMode = 'video';
     currentVideoFile = file;
 
-    showVideoMode();
+    //showVideoMode();
 
     if (currentVideoObjectUrl) {
         URL.revokeObjectURL(currentVideoObjectUrl);
@@ -396,13 +396,13 @@ function downloadResult() {
         return;
     }
 
-    if (currentMode === 'video' && resultVideo.src) {
-        const link = document.createElement('a');
-        link.download = 'tomato_detection_result.mp4';
-        link.href = resultVideo.src;
-        link.click();
-        return;
-    }
+    //if (currentMode === 'video' && resultVideo.src) {
+      //  const link = document.createElement('a');
+       // link.download = 'tomato_detection_result.mp4';
+        //link.href = resultVideo.src;
+        //link.click();
+        //return;
+    //}
 
     alert('Aucun résultat à télécharger.');
 }
