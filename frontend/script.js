@@ -337,7 +337,7 @@ function displayVideoResults(data) {
         </div>
     `;
 
-    detectionResults.style.display = 'block';
+    detectionResults.style.display = 'none';
 }
 
 function resetMediaOnly() {
