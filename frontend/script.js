@@ -128,21 +128,19 @@ function showImageMode() {
     originalTitle.textContent = '📸 Image originale';
     resultTitle.textContent = '🎯 Résultat d’analyse';
 }
+//function showVideoMode() {
+  //  originalVideo.style.display = 'block';
+    //resultVideo.style.display = 'block';
 
-function showVideoMode() {
-    originalVideo.style.display = 'block';
-    resultVideo.style.display = 'block';
+    //originalImage.style.display = 'none';
+    //originalImage.removeAttribute('src');
 
-    originalImage.style.display = 'none';
-    originalImage.removeAttribute('src');
+    //resultCanvas.style.display = 'none';
+    //ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
 
-    resultCanvas.style.display = 'none';
-    ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-
-    originalTitle.textContent = '🎥 Vidéo originale';
-    resultTitle.textContent = '🎬 Vidéo analysée';
-}
-
+    //originalTitle.textContent = '🎥 Vidéo originale';
+    //resultTitle.textContent = '🎬 Vidéo analysée';
+//}
 async function processImage(file) {
     if (file.size > 50 * 1024 * 1024) {
         alert("L'image est trop volumineuse (max 50MB)");
