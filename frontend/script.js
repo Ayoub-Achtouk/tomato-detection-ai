@@ -4,7 +4,7 @@ const mainApp = document.getElementById('mainApp');
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 const activateBtn = document.getElementById('activateAI');
 
-// Vérifier si l'IA a déjà été activée (session)
+// Vérifier si l'IA a déjà été activée
 if (sessionStorage.getItem('iaActivated') === 'true') {
     landingPage.style.display = 'none';
     mainApp.style.display = 'block';
@@ -163,14 +163,12 @@ async function processImage(file) {
     formData.append('image', file);
 
     try {
-        console.log("📤 Envoi de l'image...");
         const response = await fetch('/api/detect', {
             method: 'POST',
             body: formData
         });
 
         const data = await response.json();
-        console.log('📥 Réponse:', data);
 
         if (data.success) {
             displayImageResults(data);
@@ -282,14 +280,12 @@ async function processVideo(file) {
     formData.append('video', file);
 
     try {
-        console.log('📤 Envoi de la vidéo...');
         const response = await fetch('/api/detect-video', {
             method: 'POST',
             body: formData
         });
 
         const data = await response.json();
-        console.log('📥 Réponse vidéo:', data);
 
         if (data.success) {
             detectionBadge.textContent = `${data.total_detections || 0} détection(s)`;
@@ -336,6 +332,7 @@ function resetMediaOnly() {
     }
 
     originalImage.removeAttribute('src');
+
     originalVideo.pause();
     originalVideo.removeAttribute('src');
     originalVideo.load();
@@ -418,7 +415,7 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
-// Bouton de désactivation de l'IA
+// Bouton de désactivation
 const deactivateBtn = document.getElementById('deactivateAI');
 
 if (deactivateBtn) {
@@ -433,8 +430,6 @@ if (deactivateBtn) {
         landingPage.style.display = 'flex';
         landingPage.classList.remove('fade-out');
         landingPage.style.animation = 'fadeInUp 0.5s ease';
-
-        console.log("🔌 IA désactivée, retour à l'accueil");
     });
 }
 
