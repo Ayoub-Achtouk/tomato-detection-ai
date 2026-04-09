@@ -32,7 +32,6 @@ const originalVideo = document.getElementById('originalVideo');
 
 const resultCanvas = document.getElementById('resultCanvas');
 const ctx = resultCanvas.getContext('2d');
-//const resultVideo = document.getElementById('resultVideo');
 
 const originalTitle = document.getElementById('originalTitle');
 const resultTitle = document.getElementById('resultTitle');
@@ -120,27 +119,23 @@ function showImageMode() {
     originalVideo.removeAttribute('src');
     originalVideo.load();
 
-    resultVideo.style.display = 'none';
-    resultVideo.pause();
-    resultVideo.removeAttribute('src');
-    resultVideo.load();
-
     originalTitle.textContent = '📸 Image originale';
     resultTitle.textContent = '🎯 Résultat d’analyse';
 }
-//function showVideoMode() {
-  //  originalVideo.style.display = 'block';
-    //resultVideo.style.display = 'block';
 
-    //originalImage.style.display = 'none';
-    //originalImage.removeAttribute('src');
+function showVideoMode() {
+    originalVideo.style.display = 'block';
 
-    //resultCanvas.style.display = 'none';
-    //ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+    originalImage.style.display = 'none';
+    originalImage.removeAttribute('src');
 
-    //originalTitle.textContent = '🎥 Vidéo originale';
-    //resultTitle.textContent = '🎬 Vidéo analysée';
-//}
+    resultCanvas.style.display = 'none';
+    ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+
+    originalTitle.textContent = '🎥 Vidéo originale';
+    resultTitle.textContent = '📊 Résultats de l’analyse';
+}
+
 async function processImage(file) {
     if (file.size > 50 * 1024 * 1024) {
         alert("L'image est trop volumineuse (max 50MB)");
@@ -253,7 +248,6 @@ function displayImageResults(data) {
         detectionResults.style.display = 'block';
     };
 
-    // Si ton backend renvoie une image annotée déjà prête
     if (data.image_url) {
         img.src = data.image_url;
     } else if (currentImageObjectUrl) {
@@ -271,7 +265,7 @@ async function processVideo(file) {
     currentMode = 'video';
     currentVideoFile = file;
 
-    //showVideoMode();
+    showVideoMode();
 
     if (currentVideoObjectUrl) {
         URL.revokeObjectURL(currentVideoObjectUrl);
@@ -298,7 +292,23 @@ async function processVideo(file) {
         console.log('📥 Réponse vidéo:', data);
 
         if (data.success) {
-            displayVideoResults(data);
+            detectionBadge.textContent = `${data.total_detections || 0} détection(s)`;
+            appleCountMain.textContent = data.total_detections || 0;
+            confidenceAvg.textContent = '-';
+            confidenceFill.style.width = '0%';
+
+            detectionsList.innerHTML = `
+                <div class="detection-item">
+                    <div class="detection-number">VIDÉO ANALYSÉE</div>
+                    <div class="detection-info">
+                        <strong>🎬 Traitement terminé</strong><br>
+                        Frames traitées: ${data.total_frames || 0}<br>
+                        Détections totales: ${data.total_detections || 0}
+                    </div>
+                </div>
+            `;
+
+            detectionResults.style.display = 'block';
         } else {
             alert('Erreur: ' + data.error);
             reset();
@@ -311,7 +321,6 @@ async function processVideo(file) {
         loadingOverlay.style.display = 'none';
     }
 }
-//function displayVideoResults(data) {
 
 function resetMediaOnly() {
     currentDetections = [];
@@ -330,10 +339,6 @@ function resetMediaOnly() {
     originalVideo.pause();
     originalVideo.removeAttribute('src');
     originalVideo.load();
-
-    resultVideo.pause();
-    resultVideo.removeAttribute('src');
-    resultVideo.load();
 
     ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
 }
@@ -371,15 +376,7 @@ function downloadResult() {
         return;
     }
 
-    if (currentMode === 'video' && resultVideo.src) {
-        const link = document.createElement('a');
-        link.download = 'tomato_detection_result.mp4';
-        link.href = resultVideo.src;
-        link.click();
-        return;
-    }
-
-    alert('Aucun résultat à télécharger.');
+    alert('Téléchargement disponible seulement pour les images.');
 }
 
 // Vérifier le serveur
