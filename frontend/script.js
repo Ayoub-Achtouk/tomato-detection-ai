@@ -32,7 +32,7 @@ const originalVideo = document.getElementById('originalVideo');
 
 const resultCanvas = document.getElementById('resultCanvas');
 const ctx = resultCanvas.getContext('2d');
-const resultVideo = document.getElementById('resultVideo');
+//const resultVideo = document.getElementById('resultVideo');
 
 const originalTitle = document.getElementById('originalTitle');
 const resultTitle = document.getElementById('resultTitle');
@@ -312,17 +312,17 @@ async function processVideo(file) {
     }
 }
 
-function displayVideoResults(data) {
-    detectionBadge.textContent = `${data.total_detections || 0} détection(s)`;
-    appleCountMain.textContent = data.total_detections || 0;
+//function displayVideoResults(data) {
+  //  detectionBadge.textContent = `${data.total_detections || 0} détection(s)`;
+    //appleCountMain.textContent = data.total_detections || 0;
 
-    confidenceAvg.textContent = '-';
-    confidenceFill.style.width = '0%';
+    //confidenceAvg.textContent = '-';
+    //confidenceFill.style.width = '0%';
 
-    if (data.video_url) {
-        resultVideo.src = data.video_url;
-        resultVideo.style.display = 'block';
-    }
+    //if (data.video_url) {
+      //  resultVideo.src = data.video_url;
+        //resultVideo.style.display = 'block';
+    //}
 
     detectionsList.innerHTML = `
         <div class="detection-item">
