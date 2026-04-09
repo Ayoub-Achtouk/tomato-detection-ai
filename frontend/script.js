@@ -324,19 +324,19 @@ async function processVideo(file) {
         //resultVideo.style.display = 'block';
     //}
 
-    detectionsList.innerHTML = `
-        <div class="detection-item">
-            <div class="detection-number">VIDÉO ANALYSÉE</div>
-            <div class="detection-info">
-                <strong>🎬 Traitement terminé</strong><br>
-                Frames traitées: ${data.total_frames || 0}<br>
-                Détections totales: ${data.total_detections || 0}
-            </div>
-        </div>
-    `;
+    //detectionsList.innerHTML = `
+       // <div class="detection-item">
+         //   <div class="detection-number">VIDÉO ANALYSÉE</div>
+           // <div class="detection-info">
+             //   <strong>🎬 Traitement terminé</strong><br>
+               // Frames traitées: ${data.total_frames || 0}<br>
+                //Détections totales: ${data.total_detections || 0}
+            //</div>
+       // </div>
+    //`;
 
-    detectionResults.style.display = 'none';
-}
+  //  detectionResults.style.display = 'none';
+//}
 
 function resetMediaOnly() {
     currentDetections = [];
