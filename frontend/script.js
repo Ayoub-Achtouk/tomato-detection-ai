@@ -311,32 +311,7 @@ async function processVideo(file) {
         loadingOverlay.style.display = 'none';
     }
 }
-
 //function displayVideoResults(data) {
-  //  detectionBadge.textContent = `${data.total_detections || 0} détection(s)`;
-    //appleCountMain.textContent = data.total_detections || 0;
-
-    //confidenceAvg.textContent = '-';
-    //confidenceFill.style.width = '0%';
-
-    //if (data.video_url) {
-      //  resultVideo.src = data.video_url;
-        //resultVideo.style.display = 'block';
-    //}
-
-    //detectionsList.innerHTML = `
-       // <div class="detection-item">
-         //   <div class="detection-number">VIDÉO ANALYSÉE</div>
-           // <div class="detection-info">
-             //   <strong>🎬 Traitement terminé</strong><br>
-               // Frames traitées: ${data.total_frames || 0}<br>
-                //Détections totales: ${data.total_detections || 0}
-            //</div>
-       // </div>
-    //`;
-
-  //  detectionResults.style.display = 'none';
-//}
 
 function resetMediaOnly() {
     currentDetections = [];
@@ -396,13 +371,13 @@ function downloadResult() {
         return;
     }
 
-    //if (currentMode === 'video' && resultVideo.src) {
-      //  const link = document.createElement('a');
-       // link.download = 'tomato_detection_result.mp4';
-        //link.href = resultVideo.src;
-        //link.click();
-        //return;
-    //}
+    if (currentMode === 'video' && resultVideo.src) {
+        const link = document.createElement('a');
+        link.download = 'tomato_detection_result.mp4';
+        link.href = resultVideo.src;
+        link.click();
+        return;
+    }
 
     alert('Aucun résultat à télécharger.');
 }
